@@ -37,8 +37,6 @@ function calcCandidatePoint(anotherCircle, results){
     length1 = Math.sqrt(Math.pow(anotherCircle.x - results[0].x, 2) + Math.pow(anotherCircle.y - results[0].y, 2));
     length2 = Math.sqrt(Math.pow(anotherCircle.x - results[1].x, 2) + Math.pow(anotherCircle.y - results[1].y, 2));
     result = (length2 > length1) ? results[0] : results[1];
-  } else {
-    result = results[0];
   }
   return result;
 }
@@ -62,24 +60,43 @@ function calcDistance(pointA, pointB){
 
 BeaconLocationManager.getCurrentPosition = function (circles){
   var candidatePoints = []
-  var mostNearlyBeacon = getMostNearlyBeacon(circles);
+    var mostNearlyBeacon = getMostNearlyBeacon(circles);
 
   candidatePoints.push(calcCandidatePoint(circles[2], calcTwoCirclesCrossPoint(circles[0].x, circles[0].y, circles[0].r,
-                    circles[1].x, circles[1].y, circles[1].r)));
+          circles[1].x, circles[1].y, circles[1].r)));
   candidatePoints.push(calcCandidatePoint(circles[1], calcTwoCirclesCrossPoint(circles[0].x, circles[0].y, circles[0].r,
-                circles[2].x, circles[2].y, circles[2].r)));
+          circles[2].x, circles[2].y, circles[2].r)));
   candidatePoints.push(calcCandidatePoint(circles[0], calcTwoCirclesCrossPoint(circles[1].x, circles[1].y, circles[1].r,
-                circles[2].x, circles[2].y, circles[2].r)));
+          circles[2].x, circles[2].y, circles[2].r)));
+  //console.log('candidatePoints-----');
+  //console.log(candidatePoints);
+
+  if(candidatePoints.length == 3){
+    var currentX = (candidatePoints[0].x + candidatePoints[1].x + candidatePoints[2].x) / 3.0;
+    var currentY = (candidatePoints[0].y + candidatePoints[1].y + candidatePoints[2].y) / 3.0;
+    return {x: currentX, y: currentY};
+  }
+  else{
+    return {};
+  }
+  /*
   var points = [];
   candidatePoints.forEach(function(result){
-    if(result !== undefined){
+    if(Object.keys(result).length !== 0){
       points.push({point: result, length: calcDistance(mostNearlyBeacon, result)});
     }
-    points.sort(function(a, b){
-      return a.length -b.length;
-    });
   });
-  return points[0].point;
+
+  points.sort(function(a, b){
+    return a.length -b.length;
+  });
+  
+  if(points.length != 0){
+    return points[0].point;
+  } else {
+    return {};
+  }
+  */
 }
 
 module.exports = BeaconLocationManager;
